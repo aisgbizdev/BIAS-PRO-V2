@@ -1,0 +1,44 @@
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+type Language = 'en' | 'id';
+
+interface LanguageContextType {
+  language: Language;
+  toggleLanguage: () => void;
+  t: (en: string, id: string) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<Language>('en');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('bias-language') as Language | null;
+    if (saved === 'en' || saved === 'id') {
+      setLanguage(saved);
+    }
+  }, []);
+
+  const toggleLanguage = () => {
+    const newLang = language === 'en' ? 'id' : 'en';
+    setLanguage(newLang);
+    localStorage.setItem('bias-language', newLang);
+  };
+
+  const t = (en: string, id: string) => (language === 'en' ? en : id);
+
+  return (
+    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within LanguageProvider');
+  }
+  return context;
+}

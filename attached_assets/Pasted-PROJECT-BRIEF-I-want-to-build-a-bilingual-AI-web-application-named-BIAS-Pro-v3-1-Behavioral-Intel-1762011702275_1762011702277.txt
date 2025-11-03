@@ -1,0 +1,95 @@
+PROJECT BRIEF:
+I want to build a bilingual AI web application named BIAS Pro v3.1 – Behavioral Intelligence Audit System.
+It analyzes users’ communication, expression, and behavior using an 8-layer behavioral framework.
+The app must replicate the logic, tone, and personality of the original GPT version “BIAS Pro v3.1”.
+
+🎯 GOALS
+
+Build a Next.js + Node.js webapp with these features:
+
+Adaptive bilingual interface (English–Indonesian)
+
+Mode selector: /creator, /academic, /hybrid
+
+Gatekeeper system (requires real content before analysis)
+
+Internal “BIAS Chat” powered by AI that only discusses topics related to communication, behavior, mindset, ethics, and creative growth
+
+If user tries to talk about unrelated topics (politics, religion, romance, etc.), the AI politely redirects the conversation back to communication and self-development
+
+Free trial: users can interact or analyze up to 3 times without login
+
+After 3 interactions, show a modal that forces login via Google (Firebase Auth)
+
+After login, each user gets 100 tokens (stored in Firebase Firestore)
+
+Each AI chat or analysis reduces 1 token
+
+If tokens = 0 → show popup “Your token balance is empty. Please top up to continue.”
+
+Add token counter (top-right corner, e.g. “Tokens: 87/100”)
+
+⚙️ TECH STACK
+
+Frontend: Next.js + Tailwind CSS + Framer Motion
+
+Backend: Node.js + Express
+
+Database/Auth: Firebase (Auth + Firestore)
+
+File Upload: Cloudinary or Firebase Storage
+
+AI Core: Simulate GPT behavior locally with placeholder logic (generateBiasInsight())
+
+🧩 SYSTEM LOGIC
+
+If user input doesn’t include any video, text, or description → show gatekeeper message:
+“Bro, BIAS gak bisa menganalisa tanpa bahan real ya. Coba kirim video atau script kamu.”
+
+If input mentions “TikTok”, “IG”, or “YouTube” → use Creator Mode
+
+If mentions “leadership”, “presentasi”, “tim” → use Academic Mode
+
+Else → Hybrid Mode
+
+In each analysis, run a pseudo 8-layer process (VBM, EPM, NLP, BMIL, ECO, SOC, ETH, COG).
+Each layer returns short bilingual feedback.
+
+💬 INTERNAL CHAT (BIAS Chat)
+
+Located as a floating chat bubble in bottom-right corner
+
+Uses internal endpoint /api/chat
+
+AI should answer only if message relates to behavior, tone, speaking, or mindset
+
+Example:
+
+❌ “Apakah AI bisa jatuh cinta?” → “Haha lucu juga 😄 tapi BIAS cuma fokus ke gaya komunikasi dan perilaku kamu.”
+
+✅ “Kenapa suara aku kaku waktu presentasi?” → “Nada kamu stabil, tapi tambahin sedikit jeda biar flow-nya lebih natural.”
+
+💰 FREEMIUM LOGIC
+
+Track total requests per user in localStorage before login
+
+Max 3 requests → show login modal
+
+After login → link account with Firestore document { tokens: 100 }
+
+Each chat or analysis reduces tokens by 1
+
+When tokens run out → block new requests and show popup
+
+🧭 UI DESIGN
+
+Dashboard: left sidebar (ModeSwitch), center (Analysis Panel), right (Summary & Chat Bubble)
+
+Colors: soft beige + deep navy + accent neon cyan
+
+Include logo “Logo_BIAS.png” at top left
+
+Footer:
+
+Powered by BIAS™ – Behavioral Intelligence for Creators
+Designed by NM23 Ai | Supported by Newsmaker.id Labs

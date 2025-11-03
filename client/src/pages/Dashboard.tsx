@@ -1,0 +1,213 @@
+import { useLanguage } from '@/lib/languageContext';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Mic, Briefcase, Zap, CheckCircle, ArrowRight, BookOpen } from 'lucide-react';
+import { SiTiktok } from 'react-icons/si';
+import { Link } from 'wouter';
+import biasLogo from '@assets/bias logo_1762016709581.jpg';
+
+export default function Dashboard() {
+  const { t, language } = useLanguage();
+
+  const analysisTypes = [
+    // FIRST: Social Media Pro (Account Analytics)
+    {
+      href: '/social-media-pro',
+      icon: SiTiktok,
+      title: t('Social Media Pro', 'Social Media Pro'),
+      description: t(
+        'Deep analytics dashboard for TikTok, Instagram & YouTube accounts with premium visualizations & metrics',
+        'Dashboard analitik mendalam untuk akun TikTok, Instagram & YouTube dengan visualisasi & metrik premium'
+      ),
+      color: 'from-pink-500 to-cyan-500',
+      features: [
+        { en: 'Account performance metrics', id: 'Metrik performa akun' },
+        { en: 'Video comparison analysis', id: 'Analisis perbandingan video' },
+        { en: '6 comprehensive analytics cards', id: '6 kartu analitik komprehensif' },
+      ],
+      badge: t('Premium', 'Premium'),
+      badgeColor: 'bg-gradient-to-r from-pink-500/30 to-cyan-500/30 text-pink-300 border-pink-500/50',
+    },
+    // SECOND: Communication Analysis (General Speaking - NOT Social Media)
+    {
+      href: '/creator',
+      icon: Mic,
+      title: t('Communication Analysis', 'Analisis Komunikasi'),
+      description: t(
+        'Evaluate communication style in public speaking, presentations, talk shows, speeches & professional meetings',
+        'Evaluasi gaya komunikasi dalam public speaking, presentasi, talk show, pidato & meeting profesional'
+      ),
+      color: 'from-purple-500 to-pink-500',
+      features: [
+        { en: 'Speech delivery analysis', id: 'Analisis penyampaian bicara' },
+        { en: 'Presentation impact evaluation', id: 'Evaluasi dampak presentasi' },
+        { en: 'Communication effectiveness', id: 'Efektivitas komunikasi' },
+      ],
+      badge: t('General', 'Umum'),
+      badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/50',
+    },
+    // THIRD: Academic Analysis (Professional Context)
+    {
+      href: '/academic',
+      icon: Briefcase,
+      title: t('Academic Analysis', 'Analisis Akademik'),
+      description: t(
+        'Evaluate professional communication for leadership, academic contexts, research presentations & formal settings',
+        'Evaluasi komunikasi profesional untuk kepemimpinan, konteks akademik, presentasi riset & setting formal'
+      ),
+      color: 'from-blue-500 to-cyan-500',
+      features: [
+        { en: 'Leadership communication style', id: 'Gaya komunikasi kepemimpinan' },
+        { en: 'Professional presence assessment', id: 'Penilaian kehadiran profesional' },
+        { en: 'Logical argument structure', id: 'Struktur argumen logis' },
+      ],
+      badge: t('Professional', 'Profesional'),
+      badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/50',
+    },
+    // FOURTH: Hybrid Analysis (Combined)
+    {
+      href: '/hybrid',
+      icon: Zap,
+      title: t('Hybrid Analysis', 'Analisis Hybrid'),
+      description: t(
+        'Combined communication + academic analysis for comprehensive behavioral insights across all contexts',
+        'Analisis gabungan komunikasi + akademik untuk wawasan perilaku komprehensif di semua konteks'
+      ),
+      color: 'from-green-500 to-emerald-500',
+      features: [
+        { en: 'Full spectrum analysis', id: 'Analisis spektrum penuh' },
+        { en: 'Cross-context evaluation', id: 'Evaluasi lintas konteks' },
+        { en: 'Multi-audience impact', id: 'Dampak multi-audiens' },
+      ],
+      badge: t('Advanced', 'Lanjutan'),
+      badgeColor: 'bg-green-500/20 text-green-300 border-green-500/50',
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0A] text-white">
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-br from-purple-500/10 via-transparent to-cyan-500/10 border-b border-gray-800/50">
+        <div className="max-w-7xl mx-auto px-4 py-16 md:py-24">
+          <div className="flex flex-col items-center text-center space-y-6">
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-500 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+              BiAS²³ Pro
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl">
+              {t(
+                'Behavioral Intelligence Audit System',
+                'Sistem Audit Kecerdasan Perilaku'
+              )}
+            </p>
+            <p className="text-lg text-gray-400 max-w-2xl">
+              {t(
+                'AI-powered behavioral analysis using 8-layer framework for communicators & professionals',
+                'Analisis perilaku bertenaga AI menggunakan framework 8-layer untuk komunikator & profesional'
+              )}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Analysis Types Grid */}
+      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            {t('Choose Your Analysis Type', 'Pilih Tipe Analisis Anda')}
+          </h2>
+          <p className="text-gray-400 text-lg">
+            {t(
+              'Select the analysis mode that best fits your needs',
+              'Pilih mode analisis yang paling sesuai dengan kebutuhan Anda'
+            )}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          {analysisTypes.map((type) => {
+            const Icon = type.icon;
+            return (
+              <Card
+                key={type.href}
+                className="bg-[#141414] border-gray-800 hover-elevate group relative overflow-hidden"
+              >
+                {/* Gradient Background */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${type.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                
+                <CardHeader>
+                  <div className="flex items-start justify-between mb-2">
+                    <div className={`p-3 rounded-lg bg-gradient-to-br ${type.color} bg-opacity-10`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <Badge variant="outline" className={`${type.badgeColor} border`}>
+                      {type.badge}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-2xl bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                    {type.title}
+                  </CardTitle>
+                  <CardDescription className="text-gray-400 text-base">
+                    {type.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Features */}
+                  <div className="space-y-2">
+                    {type.features.map((feature, i) => (
+                      <div key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                        <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-cyan-400" />
+                        <span>{t(feature.en, feature.id)}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <Link href={type.href}>
+                    <Button
+                      className={`w-full bg-gradient-to-r ${type.color} hover:opacity-90 transition-opacity gap-2`}
+                      data-testid={`button-start-${type.href.slice(1)}`}
+                    >
+                      {t('Start Analysis', 'Mulai Analisis')}
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Library Link */}
+        <Card className="bg-[#141414] border-gray-800 hover-elevate">
+          <CardContent className="py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 bg-opacity-10">
+                  <BookOpen className="w-6 h-6 text-yellow-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">
+                    {t('Platform Rules Library', 'Library Aturan Platform')}
+                  </h3>
+                  <p className="text-gray-400">
+                    {t(
+                      'Browse official community guidelines for TikTok, Instagram & YouTube',
+                      'Telusuri panduan komunitas resmi untuk TikTok, Instagram & YouTube'
+                    )}
+                  </p>
+                </div>
+              </div>
+              <Link href="/library">
+                <Button variant="outline" className="gap-2" data-testid="button-go-library">
+                  {t('Browse Library', 'Buka Library')}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
