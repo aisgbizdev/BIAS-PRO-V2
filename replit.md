@@ -8,6 +8,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 4, 2025 - MOBILE RESPONSIVE HEADER + PWA SETUP ✅
+- **Mobile-First Header Redesign**: Fully responsive header with hamburger menu for mobile devices
+  - **Logo**: Clickable BiAS²³ Pro logo redirects to home page
+  - **Hamburger Menu**: Slide-out navigation menu with all pages + ChatGPT + TikTok + Language toggle
+  - **TikTok Follow Button**: Added @bias23_ai button in header (desktop shows username, mobile icon-only) + in mobile menu
+  - **Responsive Layout**: Desktop horizontal menu, mobile compact with icon-only buttons
+  - **Brand Display**: "BiAS²³ Pro" with gradient + "Bilingual • Free" subtitle (hidden on small mobile)
+- **PWA (Progressive Web App) Setup**: Installable app for Android/iOS with custom branding
+  - **Icons**: BiAS logo (192x192 & 512x512) generated from brand logo
+  - **Manifest**: Custom app manifest with BiAS branding, pink theme color (#EC4899)
+  - **Add to Home Screen**: Users can install BiAS²³ Pro as standalone app with BiAS logo (not Replit logo)
+  - **Theme Color**: Pink gradient matching BiAS brand identity
+- **Social Media Integration**: TikTok follow link (https://www.tiktok.com/@bias23_ai) prominently displayed
+
 ### November 3, 2025 - PROJECT SETUP & ADMIN PANEL ✅
 - **Replit Environment Setup**: GitHub import successfully configured for Replit environment
   - PostgreSQL database provisioned and schema migrated
@@ -40,10 +54,21 @@ The frontend utilizes React with TypeScript (Vite), employing a component-based 
 The backend is built with Express.js and TypeScript, designed as a RESTful API. It features a rule-based behavioral analysis engine (`bias-engine.ts`) implementing an 8-layer evaluation framework (VBM, EPM, NLP, ETH, ECO, SOC, COG, BMIL) with mode-specific logic. Core API endpoints handle sessions, analysis requests, and chat interactions. It currently uses in-memory storage, with planned migration to Drizzle ORM and PostgreSQL. Authentication is session-based, with a future plan for Firebase Authentication. An adaptive analysis system detects user skill levels, and a warmth detection system analyzes communication tone.
 
 ### Data Storage Solutions
-Currently, data is stored in-memory. A migration to PostgreSQL using Drizzle ORM is planned, with schemas for `sessions`, `analyses`, and `chats` tables.
+**Privacy-First Architecture**: BiAS²³ Pro uses a **disposable data model** for maximum user privacy:
+- **In-Memory Storage**: Chat history and analysis results are temporary (RAM-based), automatically cleared on server restart
+- **PostgreSQL Database**: Used ONLY for public/shared data:
+  - Library contributions (public knowledge base)
+  - Rate limiting & abuse prevention
+  - Admin panel data
+  - Session tracking (basic metadata only, no personal data)
+- **No Persistent User Data**: Analysis results and chat conversations are NOT saved to database
+- **User Control**: Planned PDF export feature allows users to download their results locally (server does not save files)
+- **Session Isolation**: Each user session (identified by unique sessionId in localStorage) maintains completely isolated data - no cross-user data leakage
+
+**Rationale**: This approach maximizes privacy, minimizes server storage costs, and gives users full control over their data. Analysis is one-time use; users can export results if needed but data is not stored server-side.
 
 ### Authentication and Authorization
-The current system uses session-based tracking with client-generated IDs and token-based rate limiting. Firebase Authentication with Google OAuth is planned for future implementation to manage user sessions and persistent data via Firestore.
+The current system uses **cookieless session tracking** with client-generated session IDs stored in browser localStorage. Each session is isolated with unique UUID-based identifiers. No user authentication system is implemented - the app is fully anonymous and privacy-focused. Firebase Authentication is NOT planned as it contradicts the privacy-first architecture.
 
 ### UI/UX Decisions
 The application features a premium design system with a dark theme (#0A0A0A), pink/cyan gradients, and glass-morphism effects. It includes metric cards with gradient text, progress bars, trend indicators, and circular progress components. Dashboards are designed for comprehensive analytics, including radar chart visualizations.
@@ -65,13 +90,14 @@ The application features a premium design system with a dark theme (#0A0A0A), pi
 -   **File-Based Analysis Support**: Supports both link-based and description-based analysis for text, video, photo, and audio content.
 -   **Intelligent Keyword Detection**: Expanded keyword coverage (200+ keywords) for audio/voice, video/content, body language, energy/emotion, language/story, and social media topics.
 -   **Chat System**: Upgraded to provide actionable, awam-friendly practical guidance with timelines, using a knowledge library-first approach for faster and more cost-effective responses. Includes a floating ChatGPT button for external, free-form conversations.
+-   **PDF Export (Planned)**: Users will be able to download analysis results as PDF for offline storage. Server generates PDF on-demand but does NOT save files - direct download to user only.
 
 ## External Dependencies
 
 ### Third-Party Services
--   **Database (Planned)**: Neon PostgreSQL (serverless) with Drizzle ORM.
--   **Authentication (Planned)**: Firebase Authentication (Google login), Firebase Firestore (user data).
--   **File Storage (Planned)**: Cloudinary or Firebase Storage.
+-   **Database**: Neon PostgreSQL (serverless) with Drizzle ORM - used for Library contributions and rate limiting only, NOT for user analysis data.
+-   **Authentication**: None - privacy-first approach with anonymous sessions.
+-   **File Storage**: None - no persistent file storage. PDF export (planned) generates files on-demand for direct download only.
 -   **AI Services**: OpenAI GPT-4o-mini (primary), Google Gemini 1.5 Flash (fallback), BIAS Library (rule-based, offline). Features automatic cascading through tiers and strict guardrails.
 -   **ChatGPT**: Custom GPT integration for free-form user conversations.
 
