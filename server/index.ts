@@ -17,8 +17,8 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static files from client/public (for service-worker.js, manifest.json, icons, etc.)
-app.use(express.static(path.resolve(import.meta.dirname, "../client/public")));
+// Serve static files from public folder (for service-worker.js, manifest.json, icons, etc.)
+app.use(express.static("public"));
 
 app.use((req, res, next) => {
   const start = Date.now();
