@@ -146,12 +146,12 @@ export function ChatBubble({ hasAnalysis = false }: ChatBubbleProps) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              className="fixed bottom-6 right-6 h-14 rounded-full shadow-lg gap-2 px-5"
+              className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-12 sm:h-14 rounded-full shadow-lg gap-2 px-4 sm:px-5"
               onClick={() => setIsOpen(true)}
               data-testid="button-chat-open"
             >
               <MessageCircle className="w-5 h-5" />
-              <span className="font-medium">
+              <span className="font-medium text-sm sm:text-base">
                 {t('Chat with BIAS - Discuss results here', 'Chat dengan BIAS - Klik untuk diskusi hasil')}
               </span>
             </Button>
@@ -169,7 +169,7 @@ export function ChatBubble({ hasAnalysis = false }: ChatBubbleProps) {
 
       {/* Chat Panel */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-96 h-[600px] shadow-xl flex flex-col z-50">
+        <Card className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] sm:w-96 sm:bottom-6 sm:right-6 h-[600px] max-h-[calc(100vh-2rem)] shadow-xl flex flex-col z-50">
           <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
             <div className="flex-1">
               <CardTitle className="text-lg">
@@ -220,7 +220,7 @@ export function ChatBubble({ hasAnalysis = false }: ChatBubbleProps) {
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${
+                      className={`max-w-[85%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap break-words ${
                         msg.role === 'user'
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted'
