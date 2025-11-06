@@ -169,7 +169,7 @@ export default function SocialMediaPro() {
       {/* Hero Section */}
       <div className="relative bg-gradient-to-br from-pink-500/10 via-transparent to-cyan-400/10 border-b border-gray-800/50">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-          <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 md:gap-3 mb-3 md:mb-4">
             <Zap className="w-6 h-6 md:w-8 md:h-8 text-pink-500 flex-shrink-0" />
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold bg-gradient-to-r from-pink-500 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
               {t('Social Media Pro', 'Social Media Pro')}
@@ -259,7 +259,7 @@ export default function SocialMediaPro() {
               <Label htmlFor="username" className="text-white">
                 {config.name} {t('Username', 'Username')} <span className="text-pink-500">*</span>
               </Label>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1 relative">
                   <PlatformIcon 
                     className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" 
@@ -277,7 +277,7 @@ export default function SocialMediaPro() {
                 <Button
                   onClick={handleAnalyzeAccount}
                   disabled={!username || isAnalyzing}
-                  className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-pink-500/20 px-8"
+                  className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-pink-500/20 px-8 w-full sm:w-auto"
                   data-testid="button-analyze-account"
                 >
                   {isAnalyzing ? (

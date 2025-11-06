@@ -18,7 +18,7 @@ export default function CreatorAnalysis() {
       {/* Hero Section */}
       <div className="relative bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 border-b border-gray-800/50">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-          <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 md:gap-3 mb-3 md:mb-4">
             <Video className="w-6 h-6 md:w-8 md:h-8 text-purple-500 flex-shrink-0" />
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold bg-gradient-to-r from-purple-500 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
               {t('Communication Analysis', 'Analisis Komunikasi')}
