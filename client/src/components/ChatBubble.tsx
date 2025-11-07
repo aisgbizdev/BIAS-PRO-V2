@@ -183,30 +183,34 @@ export function ChatBubble({ hasAnalysis = false }: ChatBubbleProps) {
 
   return (
     <>
-      {/* Floating Button - FIXED CENTER BOTTOM (Doesn't Scroll) */}
+      {/* Floating Button - FIXED POSITION (Slightly Right of Center, Never Scrolls) */}
       {!isOpen && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="fixed bottom-4 left-1/2 -translate-x-1/2 sm:bottom-6 h-10 sm:h-11 rounded-full shadow-lg gap-1.5 px-3.5 sm:px-4 z-50 max-w-fit"
-              onClick={() => setIsOpen(true)}
-              data-testid="button-chat-open"
-            >
-              <MessageCircle className="w-4 h-4 sm:w-4 sm:h-4 flex-shrink-0" />
-              <span className="font-medium text-xs sm:text-sm whitespace-nowrap">
-                {t('Chat BIAS', 'Chat BIAS')}
-              </span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top" className="max-w-xs mb-2">
-            <p className="text-sm">
-              {t(
-                'Ask questions about communication, behavioral analysis, and social media strategy. AI-powered with strict BIAS focus.',
-                'Tanya tentang komunikasi, analisis perilaku, dan strategi media sosial. Didukung AI dengan fokus ketat pada BIAS.'
-              )}
-            </p>
-          </TooltipContent>
-        </Tooltip>
+        <div className="fixed bottom-4 left-0 right-0 sm:bottom-6 z-[9999] pointer-events-none">
+          <div className="max-w-7xl mx-auto px-4 flex justify-center sm:justify-end sm:pr-[20%]">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className="h-10 sm:h-11 rounded-full shadow-lg gap-1.5 px-3.5 sm:px-4 max-w-fit pointer-events-auto"
+                  onClick={() => setIsOpen(true)}
+                  data-testid="button-chat-open"
+                >
+                  <MessageCircle className="w-4 h-4 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="font-medium text-xs sm:text-sm whitespace-nowrap">
+                    {t('Chat BIAS', 'Chat BIAS')}
+                  </span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs mb-2">
+                <p className="text-sm">
+                  {t(
+                    'Ask questions about communication, behavioral analysis, and social media strategy. AI-powered with strict BIAS focus.',
+                    'Tanya tentang komunikasi, analisis perilaku, dan strategi media sosial. Didukung AI dengan fokus ketat pada BIAS.'
+                  )}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
       )}
 
       {/* Chat Panel - Fixed Position (Doesn't Scroll) */}
