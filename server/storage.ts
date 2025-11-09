@@ -5,7 +5,9 @@ import {
   type TiktokAccount, type InsertTiktokAccount,
   type TiktokVideo, type InsertTiktokVideo,
   type TiktokComparison, type InsertTiktokComparison,
-  type LibraryContribution, type InsertLibraryContribution
+  type LibraryContribution, type InsertLibraryContribution,
+  type PageView, type InsertPageView,
+  type FeatureUsage, type InsertFeatureUsage
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -55,6 +57,15 @@ export interface IStorage {
   removeDeletedLibraryItem(itemId: string): Promise<void>;
   getDeletedLibraryItems(): Promise<string[]>;
   isLibraryItemDeleted(itemId: string): Promise<boolean>;
+
+  // Analytics tracking
+  trackPageView(pageView: InsertPageView): Promise<PageView>;
+  trackFeatureUsage(usage: InsertFeatureUsage): Promise<FeatureUsage>;
+  getPageViewStats(days?: number): Promise<{ page: string; count: number; language?: string }[]>;
+  getFeatureUsageStats(days?: number): Promise<{ featureType: string; count: number; platform?: string }[]>;
+  getUniqueSessionsCount(days?: number): Promise<number>;
+  getTotalPageViews(days?: number): Promise<number>;
+  getTotalFeatureUsage(days?: number): Promise<number>;
 }
 
 export class MemStorage implements IStorage {
@@ -66,6 +77,8 @@ export class MemStorage implements IStorage {
   private tiktokComparisons: Map<string, TiktokComparison>;
   private libraryContributions: Map<string, LibraryContribution>;
   private deletedLibraryItems: Set<string>;
+  private pageViews: Map<string, PageView>;
+  private featureUsages: Map<string, FeatureUsage>;
 
   constructor() {
     this.sessions = new Map();
@@ -76,6 +89,8 @@ export class MemStorage implements IStorage {
     this.tiktokComparisons = new Map();
     this.libraryContributions = new Map();
     this.deletedLibraryItems = new Set();
+    this.pageViews = new Map();
+    this.featureUsages = new Map();
   }
 
   // Session methods
@@ -343,6 +358,102 @@ export class MemStorage implements IStorage {
 
   async isLibraryItemDeleted(itemId: string): Promise<boolean> {
     return this.deletedLibraryItems.has(itemId);
+  }
+
+  // Analytics methods
+  async trackPageView(insertPageView: InsertPageView): Promise<PageView> {
+    const id = randomUUID();
+    const pageView: PageView = {
+      ...insertPageView,
+      id,
+      createdAt: new Date(),
+    };
+    this.pageViews.set(id, pageView);
+    return pageView;
+  }
+
+  async trackFeatureUsage(insertUsage: InsertFeatureUsage): Promise<FeatureUsage> {
+    const id = randomUUID();
+    const usage: FeatureUsage = {
+      ...insertUsage,
+      id,
+      createdAt: new Date(),
+    };
+    this.featureUsages.set(id, usage);
+    return usage;
+  }
+
+  async getPageViewStats(days: number = 7): Promise<{ page: string; count: number; language?: string }[]> {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+
+    const views = Array.from(this.pageViews.values())
+      .filter(v => v.createdAt >= cutoff);
+
+    const stats = new Map<string, { count: number; language?: string }>();
+    views.forEach(v => {
+      const key = `${v.page}|${v.language || 'unknown'}`;
+      const existing = stats.get(key) || { count: 0, language: v.language || undefined };
+      stats.set(key, { count: existing.count + 1, language: v.language || undefined });
+    });
+
+    return Array.from(stats.entries()).map(([key, data]) => ({
+      page: key.split('|')[0],
+      count: data.count,
+      language: data.language,
+    }));
+  }
+
+  async getFeatureUsageStats(days: number = 7): Promise<{ featureType: string; count: number; platform?: string }[]> {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+
+    const usages = Array.from(this.featureUsages.values())
+      .filter(u => u.createdAt >= cutoff);
+
+    const stats = new Map<string, { count: number; platform?: string }>();
+    usages.forEach(u => {
+      const key = `${u.featureType}|${u.platform || 'unknown'}`;
+      const existing = stats.get(key) || { count: 0, platform: u.platform || undefined };
+      stats.set(key, { count: existing.count + 1, platform: u.platform || undefined });
+    });
+
+    return Array.from(stats.entries()).map(([key, data]) => ({
+      featureType: key.split('|')[0],
+      count: data.count,
+      platform: data.platform,
+    }));
+  }
+
+  async getUniqueSessionsCount(days: number = 7): Promise<number> {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+
+    const uniqueSessions = new Set(
+      Array.from(this.pageViews.values())
+        .filter(v => v.createdAt >= cutoff)
+        .map(v => v.sessionId)
+    );
+
+    return uniqueSessions.size;
+  }
+
+  async getTotalPageViews(days: number = 7): Promise<number> {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+
+    return Array.from(this.pageViews.values())
+      .filter(v => v.createdAt >= cutoff)
+      .length;
+  }
+
+  async getTotalFeatureUsage(days: number = 7): Promise<number> {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+
+    return Array.from(this.featureUsages.values())
+      .filter(u => u.createdAt >= cutoff)
+      .length;
   }
 }
 
