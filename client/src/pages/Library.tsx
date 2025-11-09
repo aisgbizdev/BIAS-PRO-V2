@@ -772,8 +772,8 @@ export default function Library() {
         </div>
         <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
           {t(
-            'Complete glossary of BIAS framework and social media platform terminology',
-            'Glosarium lengkap framework BIAS dan terminologi platform media sosial'
+            'Complete community-powered glossary of BIAS framework and social media terminology. Join our library, contribute new terms, and promote your TikTok, Instagram, or YouTube account for FREE!',
+            'Glosarium lengkap yang dikembangkan komunitas untuk framework BIAS dan terminologi media sosial. Bergabunglah dengan library kami, kontribusi istilah baru, dan promosikan akun TikTok, Instagram, atau YouTube Anda GRATIS!'
           )}
         </p>
       </div>
