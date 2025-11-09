@@ -9,9 +9,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLanguage } from '@/lib/languageContext';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, BookOpen, TrendingUp, Shield, AlertCircle, CheckCircle, Heart, ShoppingCart, X, Check, Ban } from 'lucide-react';
+import { Search, BookOpen, TrendingUp, Shield, AlertCircle, CheckCircle, Heart, ShoppingCart, X, Check, Ban, BarChart3 } from 'lucide-react';
 import { SiTiktok, SiInstagram, SiYoutube } from 'react-icons/si';
 import { TIKTOK_RULES, INSTAGRAM_RULES, YOUTUBE_RULES, type PlatformRule } from '@/data/platformRules';
+import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 
 interface GlossaryTerm {
   term: string;
@@ -1088,6 +1089,7 @@ function ContributionForm() {
 function AdminPanel({ isAdmin, setIsAdmin }: { isAdmin: boolean; setIsAdmin: (v: boolean) => void }) {
   const { t, language } = useLanguage();
   const { toast } = useToast();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [pendingContributions, setPendingContributions] = useState<any[]>([]);
@@ -1096,26 +1098,32 @@ function AdminPanel({ isAdmin, setIsAdmin }: { isAdmin: boolean; setIsAdmin: (v:
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<any>({});
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      const res = await apiRequest('POST', '/api/admin/verify', { password });
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username, password }),
+      });
+      
       const data = await res.json();
       
-      if (data.isAdmin) {
+      if (res.ok && data.success) {
         setIsAdmin(true);
         toast({
           title: t('Admin Access Granted', 'Akses Admin Diberikan'),
-          description: t('Welcome, admin!', 'Selamat datang, admin!'),
+          description: t(`Welcome, ${data.username}!`, `Selamat datang, ${data.username}!`),
         });
         loadPendingContributions();
         loadAllLibraryItems();
       } else {
         toast({
-          title: t('Invalid Password', 'Password Salah'),
-          description: t('Please try again', 'Silakan coba lagi'),
+          title: t('Login Failed', 'Login Gagal'),
+          description: t(data.error || 'Invalid credentials', data.error || 'Kredensial tidak valid'),
           variant: 'destructive',
         });
       }
@@ -1127,6 +1135,22 @@ function AdminPanel({ isAdmin, setIsAdmin }: { isAdmin: boolean; setIsAdmin: (v:
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      setIsAdmin(false);
+      toast({
+        title: t('Logged Out', 'Keluar'),
+        description: t('Successfully logged out', 'Berhasil keluar'),
+      });
+    } catch (error: any) {
+      console.error('[ADMIN] Logout error:', error);
     }
   };
 
@@ -1306,13 +1330,27 @@ function AdminPanel({ isAdmin, setIsAdmin }: { isAdmin: boolean; setIsAdmin: (v:
       <div className="container max-w-md mx-auto p-6 mt-20">
         <Card>
           <CardHeader>
-            <CardTitle>{t('Admin Access', 'Akses Admin')}</CardTitle>
+            <CardTitle className="text-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
+              {t('Admin Login', 'Login Admin')}
+            </CardTitle>
             <CardDescription>
-              {t('Enter password to access admin panel', 'Masukkan password untuk mengakses panel admin')}
+              {t('Enter your credentials to access admin panel', 'Masukkan kredensial untuk mengakses panel admin')}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <form onSubmit={handleLoginSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="admin-username">{t('Username', 'Username')}</Label>
+                <Input
+                  id="admin-username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="superadmin"
+                  data-testid="input-admin-username"
+                  required
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="admin-password">{t('Password', 'Password')}</Label>
                 <Input
@@ -1320,12 +1358,13 @@ function AdminPanel({ isAdmin, setIsAdmin }: { isAdmin: boolean; setIsAdmin: (v:
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={t('Enter admin password', 'Masukkan password admin')}
+                  placeholder={t('Enter password', 'Masukkan password')}
                   data-testid="input-admin-password"
+                  required
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading} data-testid="button-admin-login">
-                {loading ? t('Verifying...', 'Memverifikasi...') : t('Login', 'Login')}
+                {loading ? t('Logging in...', 'Masuk...') : t('Login', 'Login')}
               </Button>
             </form>
           </CardContent>
@@ -1338,20 +1377,35 @@ function AdminPanel({ isAdmin, setIsAdmin }: { isAdmin: boolean; setIsAdmin: (v:
     <div className="container max-w-6xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{t('Admin Panel', 'Panel Admin')}</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
+            {t('Admin Panel', 'Panel Admin')}
+          </h1>
           <p className="text-muted-foreground">
-            {t('Review and approve library contributions', 'Review dan setujui kontribusi perpustakaan')}
+            {t('Manage library and view analytics', 'Kelola perpustakaan dan lihat analitik')}
           </p>
         </div>
-        <Button variant="outline" onClick={() => window.location.href = '/library'} data-testid="button-back-library">
-          {t('Back to Library', 'Kembali ke Perpustakaan')}
+        <Button variant="outline" onClick={handleLogout} data-testid="button-logout">
+          {t('Logout', 'Keluar')}
         </Button>
       </div>
 
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">
-          {t('Pending Contributions', 'Kontribusi Pending')} ({pendingContributions.length})
-        </h2>
+      <Tabs defaultValue="library" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="library" className="gap-2">
+            <BookOpen className="w-4 h-4" />
+            {t('Library', 'Perpustakaan')}
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="gap-2">
+            <BarChart3 className="w-4 h-4" />
+            {t('Analytics', 'Analitik')}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="library" className="space-y-6 mt-6">
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">
+              {t('Pending Contributions', 'Kontribusi Pending')} ({pendingContributions.length})
+            </h2>
 
         {pendingContributions.length === 0 ? (
           <Card>
@@ -1559,6 +1613,12 @@ function AdminPanel({ isAdmin, setIsAdmin }: { isAdmin: boolean; setIsAdmin: (v:
           </div>
         )}
       </div>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="mt-6">
+          <AnalyticsDashboard />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

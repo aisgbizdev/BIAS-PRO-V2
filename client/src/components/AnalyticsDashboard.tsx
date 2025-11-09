@@ -16,30 +16,39 @@ interface AnalyticsData {
   featureUsage: { featureType: string; count: number; platform?: string }[];
 }
 
-interface AnalyticsDashboardProps {
-  adminPassword: string;
-}
-
-export function AnalyticsDashboard({ adminPassword }: AnalyticsDashboardProps) {
+export function AnalyticsDashboard() {
   const { t, language } = useLanguage();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<string>('7');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAnalytics();
-  }, [period, adminPassword]);
+  }, [period]);
 
   const fetchAnalytics = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch(`/api/analytics/stats?password=${encodeURIComponent(adminPassword)}&days=${period}`);
+      const res = await fetch(`/api/analytics/stats?days=${period}`, {
+        credentials: 'include',
+      });
+      
+      if (res.status === 401) {
+        setError('Session expired. Please log in again.');
+        return;
+      }
+      
       if (res.ok) {
         const analytics = await res.json();
         setData(analytics);
+      } else {
+        setError('Failed to load analytics data');
       }
     } catch (error) {
       console.error('[ANALYTICS] Failed to fetch:', error);
+      setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -51,6 +60,17 @@ export function AnalyticsDashboard({ adminPassword }: AnalyticsDashboardProps) {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
         <p className="mt-4 text-muted-foreground">
           {t('Loading analytics...', 'Memuat analitik...')}
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-destructive font-medium">{error}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {t('Please refresh the page or log in again', 'Silakan refresh halaman atau login kembali')}
         </p>
       </div>
     );
