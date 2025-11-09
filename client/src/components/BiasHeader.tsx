@@ -2,8 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useLanguage } from '@/lib/languageContext';
-import { useSession } from '@/lib/sessionContext';
-import { Coins, Globe, BookOpen, Home, Mic, Briefcase, Zap, Sparkles, ExternalLink, Menu } from 'lucide-react';
+import { Globe, BookOpen, Home, Mic, ExternalLink, Menu } from 'lucide-react';
 import { SiTiktok } from 'react-icons/si';
 import { Link, useLocation } from 'wouter';
 import biasLogo from '@assets/bias logo_1762016709581.jpg';
@@ -12,7 +11,6 @@ import { openExternalLink } from '@/lib/external-link-handler';
 
 export function BiasHeader() {
   const { language, toggleLanguage, t } = useLanguage();
-  const { session } = useSession();
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -57,19 +55,6 @@ export function BiasHeader() {
                   </Link>
                 );
               })}
-              
-              {/* ChatGPT in Mobile Menu */}
-              <Button
-                onClick={() => {
-                  openExternalLink('https://chatgpt.com/g/g-68f512b32ef88191985d7e15f828ae7d-bias-pro-behavioral-intelligence-audit-system');
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full justify-start gap-3 h-12 mt-2 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Chat GPT</span>
-                <ExternalLink className="w-3 h-3 ml-auto" />
-              </Button>
 
               {/* TikTok Follow in Mobile Menu */}
               <Button
@@ -141,7 +126,7 @@ export function BiasHeader() {
           })}
         </div>
 
-        {/* Right Side: TikTok + ChatGPT + Language */}
+        {/* Right Side: TikTok + Language */}
         <div className="flex items-center gap-1 md:gap-2 shrink-0">
           {/* TikTok Follow - Always Visible */}
           <Button
@@ -154,20 +139,6 @@ export function BiasHeader() {
           >
             <SiTiktok className="w-3.5 h-3.5" />
             <span className="text-xs font-medium hidden lg:inline">@bias23_ai</span>
-          </Button>
-
-          {/* ChatGPT Button */}
-          <Button
-            onClick={() => openExternalLink('https://chatgpt.com/g/g-68f512b32ef88191985d7e15f828ae7d-bias-pro-behavioral-intelligence-audit-system')}
-            size="sm"
-            data-testid="button-chatgpt"
-            className="gap-1 h-8 px-2 md:px-3 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white border-0 shadow-md hover:shadow-lg transition-all"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span className="hidden lg:inline font-medium text-xs">
-              {language === 'id' ? 'Chat GPT' : 'Chat GPT'}
-            </span>
-            <ExternalLink className="w-3 h-3 hidden md:inline" />
           </Button>
 
           {/* Language Toggle */}

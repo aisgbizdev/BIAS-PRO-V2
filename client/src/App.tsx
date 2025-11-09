@@ -4,9 +4,9 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/lib/languageContext";
-import { SessionProvider, useSession } from "@/lib/sessionContext";
+import { SessionProvider } from "@/lib/sessionContext";
 import { BiasHeader } from "@/components/BiasHeader";
-import { ChatBubble } from "@/components/ChatBubble";
+import { FloatingChatGPT } from "@/components/FloatingChatGPT";
 import Dashboard from "@/pages/Dashboard";
 import Library from "@/pages/Library";
 import SocialMediaPro from "@/pages/social-media-pro";
@@ -42,15 +42,13 @@ function Router() {
 }
 
 function AppContent() {
-  const { hasAnalysis } = useSession();
-  
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <BiasHeader />
       <main className="flex-1 overflow-auto">
         <Router />
       </main>
-      <ChatBubble hasAnalysis={hasAnalysis} />
+      <FloatingChatGPT />
       <footer className="border-t py-4 text-center text-sm text-muted-foreground">
         <p>
           BiAS<sup className="text-[0.6em]">23</sup> Pro • Behavioral Intelligence Audit System •{' '}
