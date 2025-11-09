@@ -364,7 +364,9 @@ export class MemStorage implements IStorage {
   async trackPageView(insertPageView: InsertPageView): Promise<PageView> {
     const id = randomUUID();
     const pageView: PageView = {
-      ...insertPageView,
+      sessionId: insertPageView.sessionId,
+      page: insertPageView.page,
+      language: insertPageView.language ?? null,
       id,
       createdAt: new Date(),
     };
@@ -375,7 +377,12 @@ export class MemStorage implements IStorage {
   async trackFeatureUsage(insertUsage: InsertFeatureUsage): Promise<FeatureUsage> {
     const id = randomUUID();
     const usage: FeatureUsage = {
-      ...insertUsage,
+      sessionId: insertUsage.sessionId,
+      featureType: insertUsage.featureType,
+      featureDetails: insertUsage.featureDetails ?? null,
+      platform: insertUsage.platform ?? null,
+      mode: insertUsage.mode ?? null,
+      language: insertUsage.language ?? null,
       id,
       createdAt: new Date(),
     };

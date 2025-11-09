@@ -901,6 +901,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Analytics - Track page view
+  app.post("/api/analytics/pageview", async (req, res) => {
+    try {
+      const { sessionId, page, language } = req.body;
+      
+      if (!sessionId || !page) {
+        return res.status(400).json({ error: 'sessionId and page are required' });
+      }
+      
+      await storage.trackPageView({
+        sessionId,
+        page,
+        language: language || null,
+      });
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[ANALYTICS] Error tracking page view:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Analytics - Track feature usage
+  app.post("/api/analytics/feature", async (req, res) => {
+    try {
+      const { sessionId, featureType, platform, mode, language, featureDetails } = req.body;
+      
+      if (!sessionId || !featureType) {
+        return res.status(400).json({ error: 'sessionId and featureType are required' });
+      }
+      
+      await storage.trackFeatureUsage({
+        sessionId,
+        featureType,
+        platform: platform || null,
+        mode: mode || null,
+        language: language || null,
+        featureDetails: featureDetails || null,
+      });
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[ANALYTICS] Error tracking feature usage:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Analytics - Get stats (admin only)
+  app.get("/api/analytics/stats", async (req, res) => {
+    try {
+      const { password, days } = req.query;
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      
+      if (!adminPassword) {
+        return res.status(500).json({ error: 'Admin password not configured' });
+      }
+      
+      if (password !== adminPassword) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+      
+      const daysNum = days ? parseInt(days as string) : 7;
+      
+      const [
+        pageViewStats,
+        featureUsageStats,
+        uniqueSessions,
+        totalPageViews,
+        totalFeatureUsage
+      ] = await Promise.all([
+        storage.getPageViewStats(daysNum),
+        storage.getFeatureUsageStats(daysNum),
+        storage.getUniqueSessionsCount(daysNum),
+        storage.getTotalPageViews(daysNum),
+        storage.getTotalFeatureUsage(daysNum),
+      ]);
+      
+      res.json({
+        period: `${daysNum} days`,
+        overview: {
+          uniqueSessions,
+          totalPageViews,
+          totalFeatureUsage,
+        },
+        pageViews: pageViewStats,
+        featureUsage: featureUsageStats,
+      });
+    } catch (error: any) {
+      console.error('[ANALYTICS] Error getting stats:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
