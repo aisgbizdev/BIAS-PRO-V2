@@ -103,6 +103,27 @@ export const libraryContributions = pgTable("library_contributions", {
   approvedAt: timestamp("approved_at"),
 });
 
+// Analytics: Page views tracking
+export const pageViews = pgTable("page_views", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: text("session_id").notNull(),
+  page: text("page").notNull(), // 'dashboard', 'social-pro', 'creator', 'library'
+  language: text("language"), // 'en' or 'id'
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Analytics: Feature usage tracking
+export const featureUsage = pgTable("feature_usage", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: text("session_id").notNull(),
+  featureType: text("feature_type").notNull(), // 'analysis', 'chat', 'comparison', 'video_upload', 'account_analysis'
+  featureDetails: text("feature_details"), // JSON string with additional context
+  platform: text("platform"), // 'tiktok', 'instagram', 'youtube', 'professional'
+  mode: text("mode"), // 'social-pro', 'creator' for analysis context
+  language: text("language"), // 'en' or 'id'
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertSessionSchema = createInsertSchema(sessions).omit({ id: true, createdAt: true, lastActiveAt: true });
 export const insertAnalysisSchema = createInsertSchema(analyses).omit({ id: true, createdAt: true });
 export const insertChatSchema = createInsertSchema(chats).omit({ id: true, createdAt: true });
@@ -110,6 +131,8 @@ export const insertTiktokAccountSchema = createInsertSchema(tiktokAccounts).omit
 export const insertTiktokVideoSchema = createInsertSchema(tiktokVideos).omit({ id: true, createdAt: true });
 export const insertTiktokComparisonSchema = createInsertSchema(tiktokComparisons).omit({ id: true, createdAt: true });
 export const insertLibraryContributionSchema = createInsertSchema(libraryContributions).omit({ id: true, createdAt: true, approvedAt: true });
+export const insertPageViewSchema = createInsertSchema(pageViews).omit({ id: true, createdAt: true });
+export const insertFeatureUsageSchema = createInsertSchema(featureUsage).omit({ id: true, createdAt: true });
 
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
@@ -125,6 +148,10 @@ export type InsertTiktokComparison = z.infer<typeof insertTiktokComparisonSchema
 export type TiktokComparison = typeof tiktokComparisons.$inferSelect;
 export type InsertLibraryContribution = z.infer<typeof insertLibraryContributionSchema>;
 export type LibraryContribution = typeof libraryContributions.$inferSelect;
+export type InsertPageView = z.infer<typeof insertPageViewSchema>;
+export type PageView = typeof pageViews.$inferSelect;
+export type InsertFeatureUsage = z.infer<typeof insertFeatureUsageSchema>;
+export type FeatureUsage = typeof featureUsage.$inferSelect;
 
 // BIAS Analysis Result Types
 export interface BiasLayerResult {
