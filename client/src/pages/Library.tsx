@@ -711,9 +711,9 @@ export default function Library() {
   };
 
   const filteredBias = filterTerms(biasTerms);
-  const filteredTikTok = filterTerms([...tiktokTerms, ...contributedTerms.tiktok]);
-  const filteredInstagram = filterTerms([...instagramTerms, ...contributedTerms.instagram]);
-  const filteredYouTube = filterTerms([...youtubeTerms, ...contributedTerms.youtube]);
+  const filteredTikTok = filterTerms([...contributedTerms.tiktok, ...tiktokTerms]);
+  const filteredInstagram = filterTerms([...contributedTerms.instagram, ...instagramTerms]);
+  const filteredYouTube = filterTerms([...contributedTerms.youtube, ...youtubeTerms]);
 
   const TermCard = ({ term }: { term: GlossaryTerm }) => (
     <Card>
@@ -791,13 +791,8 @@ export default function Library() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="bias" className="w-full">
+      <Tabs defaultValue="tiktok" className="w-full">
         <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 gap-1">
-          <TabsTrigger value="bias" className="gap-1 text-[10px] sm:text-sm px-1 sm:px-3" data-testid="tab-bias">
-            <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-            <span className="hidden sm:inline">BIAS ({filteredBias.length})</span>
-            <span className="sm:hidden">BIAS</span>
-          </TabsTrigger>
           <TabsTrigger value="tiktok" className="gap-1 text-[10px] sm:text-sm px-1 sm:px-3" data-testid="tab-tiktok">
             <SiTiktok className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
             <span className="hidden sm:inline">TikTok ({filteredTikTok.length})</span>
@@ -813,15 +808,20 @@ export default function Library() {
             <span className="hidden sm:inline">YouTube ({filteredYouTube.length})</span>
             <span className="sm:hidden">YT</span>
           </TabsTrigger>
-          <TabsTrigger value="rules" className="gap-1 text-[10px] sm:text-sm px-1 sm:px-3" data-testid="tab-rules">
-            <Shield className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-            <span className="hidden sm:inline">{t('Rules', 'Aturan')}</span>
-            <span className="sm:hidden">{t('Rules', 'Aturan')}</span>
+          <TabsTrigger value="bias" className="gap-1 text-[10px] sm:text-sm px-1 sm:px-3" data-testid="tab-bias">
+            <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="hidden sm:inline">BIAS ({filteredBias.length})</span>
+            <span className="sm:hidden">BIAS</span>
           </TabsTrigger>
           <TabsTrigger value="contribute" className="gap-1 text-[10px] sm:text-sm px-1 sm:px-3" data-testid="tab-contribute">
             <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
             <span className="hidden sm:inline">{t('Contribute', 'Kontribusi')}</span>
             <span className="sm:hidden">+</span>
+          </TabsTrigger>
+          <TabsTrigger value="rules" className="gap-1 text-[10px] sm:text-sm px-1 sm:px-3" data-testid="tab-rules">
+            <Shield className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="hidden sm:inline">{t('Guidelines', 'Panduan')}</span>
+            <span className="sm:hidden">{t('Guidelines', 'Panduan')}</span>
           </TabsTrigger>
         </TabsList>
 
