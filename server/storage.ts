@@ -7,9 +7,13 @@ import {
   type TiktokComparison, type InsertTiktokComparison,
   type LibraryContribution, type InsertLibraryContribution,
   type PageView, type InsertPageView,
-  type FeatureUsage, type InsertFeatureUsage
+  type FeatureUsage, type InsertFeatureUsage,
+  type AdminSession, type InsertAdminSession,
+  adminSessions
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "../db";
+import { eq, lt, and, gt } from "drizzle-orm";
 
 export interface IStorage {
   // Session management
@@ -506,12 +510,223 @@ export class MemStorage implements IStorage {
 
   async cleanExpiredAdminSessions(): Promise<void> {
     const now = new Date();
-    for (const [sessionId, session] of this.adminSessions.entries()) {
+    Array.from(this.adminSessions.entries()).forEach(([sessionId, session]) => {
       if (session.expiresAt < now) {
         this.adminSessions.delete(sessionId);
       }
-    }
+    });
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  private memStorage: MemStorage;
+
+  constructor() {
+    this.memStorage = new MemStorage();
+  }
+
+  async getSession(sessionId: string): Promise<Session | undefined> {
+    return this.memStorage.getSession(sessionId);
+  }
+
+  async createSession(session: InsertSession): Promise<Session> {
+    return this.memStorage.createSession(session);
+  }
+
+  async updateSession(sessionId: string, updates: Partial<Session>): Promise<Session | undefined> {
+    return this.memStorage.updateSession(sessionId, updates);
+  }
+
+  async createAnalysis(analysis: InsertAnalysis): Promise<Analysis> {
+    return this.memStorage.createAnalysis(analysis);
+  }
+
+  async getAnalysesBySession(sessionId: string): Promise<Analysis[]> {
+    return this.memStorage.getAnalysesBySession(sessionId);
+  }
+
+  async createChat(chat: InsertChat): Promise<Chat> {
+    return this.memStorage.createChat(chat);
+  }
+
+  async getChatsBySession(sessionId: string): Promise<Chat[]> {
+    return this.memStorage.getChatsBySession(sessionId);
+  }
+
+  async clearChatsBySession(sessionId: string): Promise<void> {
+    return this.memStorage.clearChatsBySession(sessionId);
+  }
+
+  async createTiktokAccount(account: InsertTiktokAccount): Promise<TiktokAccount> {
+    return this.memStorage.createTiktokAccount(account);
+  }
+
+  async getTiktokAccount(id: string): Promise<TiktokAccount | undefined> {
+    return this.memStorage.getTiktokAccount(id);
+  }
+
+  async getTiktokAccountByUsername(username: string): Promise<TiktokAccount | undefined> {
+    return this.memStorage.getTiktokAccountByUsername(username);
+  }
+
+  async getTiktokAccountsBySession(sessionId: string): Promise<TiktokAccount[]> {
+    return this.memStorage.getTiktokAccountsBySession(sessionId);
+  }
+
+  async updateTiktokAccount(id: string, updates: Partial<TiktokAccount>): Promise<TiktokAccount | undefined> {
+    return this.memStorage.updateTiktokAccount(id, updates);
+  }
+
+  async createTiktokVideo(video: InsertTiktokVideo): Promise<TiktokVideo> {
+    return this.memStorage.createTiktokVideo(video);
+  }
+
+  async getTiktokVideo(id: string): Promise<TiktokVideo | undefined> {
+    return this.memStorage.getTiktokVideo(id);
+  }
+
+  async getTiktokVideosBySession(sessionId: string): Promise<TiktokVideo[]> {
+    return this.memStorage.getTiktokVideosBySession(sessionId);
+  }
+
+  async getTiktokVideosByAccount(accountUsername: string): Promise<TiktokVideo[]> {
+    return this.memStorage.getTiktokVideosByAccount(accountUsername);
+  }
+
+  async createTiktokComparison(comparison: InsertTiktokComparison): Promise<TiktokComparison> {
+    return this.memStorage.createTiktokComparison(comparison);
+  }
+
+  async getTiktokComparison(id: string): Promise<TiktokComparison | undefined> {
+    return this.memStorage.getTiktokComparison(id);
+  }
+
+  async getTiktokComparisonsBySession(sessionId: string): Promise<TiktokComparison[]> {
+    return this.memStorage.getTiktokComparisonsBySession(sessionId);
+  }
+
+  async createLibraryContribution(contribution: InsertLibraryContribution): Promise<LibraryContribution> {
+    return this.memStorage.createLibraryContribution(contribution);
+  }
+
+  async getLibraryContribution(id: string): Promise<LibraryContribution | undefined> {
+    return this.memStorage.getLibraryContribution(id);
+  }
+
+  async getPendingContributions(): Promise<LibraryContribution[]> {
+    return this.memStorage.getPendingContributions();
+  }
+
+  async getApprovedContributions(): Promise<LibraryContribution[]> {
+    return this.memStorage.getApprovedContributions();
+  }
+
+  async updateLibraryContribution(id: string, updates: Partial<LibraryContribution>): Promise<LibraryContribution | undefined> {
+    return this.memStorage.updateLibraryContribution(id, updates);
+  }
+
+  async deleteLibraryContribution(id: string): Promise<boolean> {
+    return this.memStorage.deleteLibraryContribution(id);
+  }
+
+  async addDeletedLibraryItem(itemId: string): Promise<void> {
+    return this.memStorage.addDeletedLibraryItem(itemId);
+  }
+
+  async removeDeletedLibraryItem(itemId: string): Promise<void> {
+    return this.memStorage.removeDeletedLibraryItem(itemId);
+  }
+
+  async getDeletedLibraryItems(): Promise<string[]> {
+    return this.memStorage.getDeletedLibraryItems();
+  }
+
+  async isLibraryItemDeleted(itemId: string): Promise<boolean> {
+    return this.memStorage.isLibraryItemDeleted(itemId);
+  }
+
+  async trackPageView(pageView: InsertPageView): Promise<PageView> {
+    return this.memStorage.trackPageView(pageView);
+  }
+
+  async trackFeatureUsage(usage: InsertFeatureUsage): Promise<FeatureUsage> {
+    return this.memStorage.trackFeatureUsage(usage);
+  }
+
+  async getPageViewStats(days: number = 7): Promise<{ page: string; count: number; language?: string }[]> {
+    return this.memStorage.getPageViewStats(days);
+  }
+
+  async getFeatureUsageStats(days: number = 7): Promise<{ featureType: string; count: number; platform?: string }[]> {
+    return this.memStorage.getFeatureUsageStats(days);
+  }
+
+  async getUniqueSessionsCount(days: number = 7): Promise<number> {
+    return this.memStorage.getUniqueSessionsCount(days);
+  }
+
+  async getTotalPageViews(days: number = 7): Promise<number> {
+    return this.memStorage.getTotalPageViews(days);
+  }
+
+  async getTotalFeatureUsage(days: number = 7): Promise<number> {
+    return this.memStorage.getTotalFeatureUsage(days);
+  }
+
+  async createAdminSession(sessionId: string, username: string): Promise<{ sessionId: string; username: string; createdAt: Date; expiresAt: Date }> {
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+    const [inserted] = await db.insert(adminSessions).values({
+      sessionId,
+      username,
+      expiresAt,
+    }).returning();
+
+    return {
+      sessionId: inserted.sessionId,
+      username: inserted.username,
+      createdAt: inserted.createdAt,
+      expiresAt: inserted.expiresAt,
+    };
+  }
+
+  async getAdminSession(sessionId: string): Promise<{ sessionId: string; username: string; createdAt: Date; expiresAt: Date } | undefined> {
+    const now = new Date();
+    
+    const [session] = await db
+      .select()
+      .from(adminSessions)
+      .where(
+        and(
+          eq(adminSessions.sessionId, sessionId),
+          gt(adminSessions.expiresAt, now)
+        )
+      )
+      .limit(1);
+
+    if (!session) return undefined;
+
+    return {
+      sessionId: session.sessionId,
+      username: session.username,
+      createdAt: session.createdAt,
+      expiresAt: session.expiresAt,
+    };
+  }
+
+  async deleteAdminSession(sessionId: string): Promise<void> {
+    await db
+      .delete(adminSessions)
+      .where(eq(adminSessions.sessionId, sessionId));
+  }
+
+  async cleanExpiredAdminSessions(): Promise<void> {
+    const now = new Date();
+    await db
+      .delete(adminSessions)
+      .where(lt(adminSessions.expiresAt, now));
+  }
+}
+
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();

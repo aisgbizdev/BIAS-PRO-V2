@@ -124,6 +124,15 @@ export const featureUsage = pgTable("feature_usage", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Admin sessions for authentication
+export const adminSessions = pgTable("admin_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: text("session_id").notNull().unique(),
+  username: text("username").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(),
+});
+
 export const insertSessionSchema = createInsertSchema(sessions).omit({ id: true, createdAt: true, lastActiveAt: true });
 export const insertAnalysisSchema = createInsertSchema(analyses).omit({ id: true, createdAt: true });
 export const insertChatSchema = createInsertSchema(chats).omit({ id: true, createdAt: true });
@@ -133,6 +142,7 @@ export const insertTiktokComparisonSchema = createInsertSchema(tiktokComparisons
 export const insertLibraryContributionSchema = createInsertSchema(libraryContributions).omit({ id: true, createdAt: true, approvedAt: true });
 export const insertPageViewSchema = createInsertSchema(pageViews).omit({ id: true, createdAt: true });
 export const insertFeatureUsageSchema = createInsertSchema(featureUsage).omit({ id: true, createdAt: true });
+export const insertAdminSessionSchema = createInsertSchema(adminSessions).omit({ id: true, createdAt: true });
 
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
@@ -152,6 +162,8 @@ export type InsertPageView = z.infer<typeof insertPageViewSchema>;
 export type PageView = typeof pageViews.$inferSelect;
 export type InsertFeatureUsage = z.infer<typeof insertFeatureUsageSchema>;
 export type FeatureUsage = typeof featureUsage.$inferSelect;
+export type InsertAdminSession = z.infer<typeof insertAdminSessionSchema>;
+export type AdminSession = typeof adminSessions.$inferSelect;
 
 // BIAS Analysis Result Types
 export interface BiasLayerResult {
